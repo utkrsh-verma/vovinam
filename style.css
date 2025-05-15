@@ -1,0 +1,60 @@
+* {
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #f4f4f4;
+}
+
+header {
+  background: #003d7a;
+  color: white;
+  padding: 1rem;
+  text-align: center;
+}
+
+header nav a {
+  margin: 0 1rem;
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+main {
+  padding: 2rem;
+}
+
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+form input,
+form select,
+form button {
+  padding: 0.5rem;
+  font-size: 1rem;
+}
+
+button {
+  background: #007b00;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+#matchesContainer {
+  margin-top: 2rem;
+}
+
+.category {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}

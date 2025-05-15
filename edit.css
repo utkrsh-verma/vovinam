@@ -1,0 +1,224 @@
+/* Reset some default styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #eef2f7;
+  margin: 0;
+  padding: 20px;
+  color: #2c3e50;
+}
+
+/* Navigation bar */
+.navbar {
+  margin-bottom: 25px;
+  text-align: center;
+  background: #34495e;
+  padding: 10px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.navbar a {
+  color: #ecf0f1;
+  text-decoration: none;
+  font-weight: 600;
+  margin: 0 15px;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+}
+
+.navbar a:hover {
+  color: #1abc9c;
+}
+
+/* Heading */
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  font-weight: 700;
+  font-size: 2rem;
+  color: #34495e;
+}
+
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+thead tr {
+  background: #1abc9c;
+  color: white;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+thead th {
+  padding: 15px 10px;
+  text-align: center;
+}
+
+tbody tr {
+  background: #f8fafc;
+  transition: background-color 0.3s ease;
+}
+
+tbody tr:hover {
+  background-color: #d1f0ea;
+}
+
+tbody td {
+  padding: 12px 10px;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #2c3e50;
+}
+
+/* Buttons */
+button {
+  padding: 8px 14px;
+  margin: 0 5px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+button.edit {
+  background-color: #3498db;
+  color: white;
+}
+
+button.edit:hover {
+  background-color: #2980b9;
+}
+
+button.delete {
+  background-color: #e74c3c;
+  color: white;
+}
+
+button.delete:hover {
+  background-color: #c0392b;
+}
+
+/* Modal overlay */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+/* Modal content box */
+.modal-content {
+  background: white;
+  padding: 30px 25px;
+  border-radius: 12px;
+  width: 360px;
+  max-width: 100%;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  position: relative;
+  font-size: 1rem;
+}
+
+/* Form labels */
+label {
+  display: block;
+  margin-top: 15px;
+  font-weight: 600;
+  color: #34495e;
+}
+
+/* Inputs and select */
+input[type="text"],
+input[type="date"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 10px 12px;
+  margin-top: 6px;
+  border: 1.8px solid #bdc3c7;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="number"]:focus,
+select:focus {
+  border-color: #1abc9c;
+  outline: none;
+}
+
+/* Modal buttons container */
+.modal-buttons {
+  margin-top: 25px;
+  text-align: right;
+}
+
+/* Modal buttons styling */
+.modal-buttons button {
+  min-width: 90px;
+}
+
+.modal-buttons #saveBtn {
+  background-color: #1abc9c;
+  color: white;
+  margin-right: 10px;
+}
+
+.modal-buttons #saveBtn:hover {
+  background-color: #16a085;
+}
+
+.modal-buttons #cancelBtn {
+  background-color: #7f8c8d;
+  color: white;
+}
+
+.modal-buttons #cancelBtn:hover {
+  background-color: #636e72;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+  
+  .modal-content {
+    width: 90%;
+    padding: 20px;
+  }
+  
+  table {
+    font-size: 0.9rem;
+  }
+  
+  button {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+  
+  .navbar a {
+    margin: 0 8px;
+    font-size: 1rem;
+  }
+}
