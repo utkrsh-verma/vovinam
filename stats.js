@@ -1,87 +1,72 @@
-// Define age categories with labels and range inclusive
-const ageCategories = [
-  { label: "Mini Sub Junior", min: 0, max: 7 },
-  { label: "Sub Junior", min: 8, max: 13 },
-  { label: "Junior", min: 14, max: 17 },
-  { label: "Senior", min: 18, max: 35 },
-  { label: "Veteran", min: 36, max: 100 }
-];
-
-// Weight categories ranges and labels
-const weightCategories = [
-  { label: "25 to 30 kg", min: 25, max: 30 },
-  { label: "30 to 35 kg", min: 30, max: 35 },
-  { label: "35 to 40 kg", min: 35, max: 40 },
-  { label: "40 to 45 kg", min: 40, max: 45 },
-  { label: "45 to 50 kg", min: 45, max: 50 }
-];
-
-// Helper function: get age category by age
-function getAgeCategory(age) {
-  return ageCategories.find(cat => age >= cat.min && age <= cat.max);
-}
-
-// Helper function: get weight category by weight
-function getWeightCategory(weight) {
-  return weightCategories.find(cat => weight >= cat.min && weight < cat.max);
-}
-
-// Main function to load and show stats
-function showStats() {
+document.addEventListener("DOMContentLoaded", () => {
   const statsContainer = document.getElementById("statsContainer");
+  const participants = JSON.parse(localStorage.getItem("participants")) || [];
 
-  // Load participants from localStorage (assuming they are saved with key 'participants')
-  let participants = JSON.parse(localStorage.getItem("participants")) || [];
+  const weightCategories = [
+    { range: "25-30", min: 25, max: 30 },
+    { range: "30-35", min: 30, max: 35 },
+    { range: "35-40", min: 35, max: 40 },
+    { range: "40-45", min: 40, max: 45 },
+    { range: "45-50", min: 45, max: 50 },
+  ];
 
-  if (participants.length === 0) {
-    statsContainer.innerHTML = "<p>No participants data found.</p>";
-    return;
+  function getAge(dobStr) {
+    const dob = new Date(dobStr);
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) age--;
+    return age;
   }
 
-  // Organize data: ageCategory -> weightCategory -> count
-  const statsData = {};
+  const categorized = {};
 
   participants.forEach(p => {
-    const age = parseInt(p.age);
-    const weight = parseFloat(p.weight);
+    const age = getAge(p.dob);
+    let category = "";
+    if (age < 8) category = "Mini Sub Junior";
+    else if (age < 14) category = "Sub Junior";
+    else if (age < 18) category = "Junior";
+    else if (age <= 35) category = "Senior";
+    else category = "Above Senior";
 
-    const ageCat = getAgeCategory(age);
-    const weightCat = getWeightCategory(weight);
+    if (!categorized[category]) categorized[category] = {};
 
-    if (!ageCat || !weightCat) return; // skip invalid data
-
-    if (!statsData[ageCat.label]) {
-      statsData[ageCat.label] = {};
+    for (const weightGroup of weightCategories) {
+      if (p.weight >= weightGroup.min && p.weight < weightGroup.max) {
+        const key = weightGroup.range;
+        if (!categorized[category][key]) categorized[category][key] = 0;
+        categorized[category][key]++;
+        break;
+      }
     }
-
-    if (!statsData[ageCat.label][weightCat.label]) {
-      statsData[ageCat.label][weightCat.label] = 0;
-    }
-
-    statsData[ageCat.label][weightCat.label]++;
   });
 
-  // Now render the stats into HTML
-  statsContainer.innerHTML = ""; // Clear existing content
+  for (const category in categorized) {
+    const section = document.createElement("div");
+    section.className = "category-section";
 
-  for (const [ageCat, weights] of Object.entries(statsData)) {
-    const catDiv = document.createElement("div");
-    catDiv.classList.add("category");
+    const title = document.createElement("h2");
+    title.className = "category-title";
+    title.textContent = category;
+    section.appendChild(title);
 
-    const catTitle = document.createElement("h2");
-    catTitle.textContent = ageCat;
-    catDiv.appendChild(catTitle);
+    const table = document.createElement("table");
+    const thead = document.createElement("thead");
+    const headRow = document.createElement("tr");
+    headRow.innerHTML = `<th>Weight Category</th><th>Participants</th>`;
+    thead.appendChild(headRow);
+    table.appendChild(thead);
 
-    for (const [weightCat, count] of Object.entries(weights)) {
-      const weightDiv = document.createElement("div");
-      weightDiv.classList.add("weight-category");
-      weightDiv.textContent = `${weightCat} — ${count} participant${count > 1 ? "s" : ""}`;
-      catDiv.appendChild(weightDiv);
+    const tbody = document.createElement("tbody");
+    for (const weight in categorized[category]) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td>${weight}</td><td>${categorized[category][weight]}</td>`;
+      tbody.appendChild(tr);
     }
 
-    statsContainer.appendChild(catDiv);
+    table.appendChild(tbody);
+    section.appendChild(table);
+    statsContainer.appendChild(section);
   }
-}
-
-// Run when page loads
-window.onload = showStats;
+});
