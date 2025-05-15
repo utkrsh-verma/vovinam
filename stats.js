@@ -1,111 +1,87 @@
-// Weight categories definition
-const weightCategories = [
-  { min: 25, max: 30, label: "25 to 30 kg" },
-  { min: 30, max: 35, label: "30 to 35 kg" },
-  { min: 35, max: 40, label: "35 to 40 kg" },
-  { min: 40, max: 45, label: "40 to 45 kg" },
-  { min: 45, max: 50, label: "45 to 50 kg" },
+// Define age categories with labels and range inclusive
+const ageCategories = [
+  { label: "Mini Sub Junior", min: 0, max: 7 },
+  { label: "Sub Junior", min: 8, max: 13 },
+  { label: "Junior", min: 14, max: 17 },
+  { label: "Senior", min: 18, max: 35 },
+  { label: "Veteran", min: 36, max: 100 }
 ];
 
-// Calculate age from DOB string (yyyy-mm-dd)
-function calculateAge(dobStr) {
-  const dob = new Date(dobStr);
-  const today = new Date();
-  let age = today.getFullYear() - dob.getFullYear();
-  const m = today.getMonth() - dob.getMonth();
-  if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
-    age--;
-  }
-  return age;
+// Weight categories ranges and labels
+const weightCategories = [
+  { label: "25 to 30 kg", min: 25, max: 30 },
+  { label: "30 to 35 kg", min: 30, max: 35 },
+  { label: "35 to 40 kg", min: 35, max: 40 },
+  { label: "40 to 45 kg", min: 40, max: 45 },
+  { label: "45 to 50 kg", min: 45, max: 50 }
+];
+
+// Helper function: get age category by age
+function getAgeCategory(age) {
+  return ageCategories.find(cat => age >= cat.min && age <= cat.max);
 }
 
-// Categorize participant by age
-function getCategory(age) {
-  if (age < 8) return "Mini Sub Junior";
-  if (age >= 14 && age < 18) return "Junior";
-  if (age >= 18 && age <= 35) return "Senior";
-  return "Other";
+// Helper function: get weight category by weight
+function getWeightCategory(weight) {
+  return weightCategories.find(cat => weight >= cat.min && weight < cat.max);
 }
 
-// Count participants per category and weight group
-function countParticipants(participants) {
-  const stats = {
-    "Mini Sub Junior": {},
-    Junior: {},
-    Senior: {},
-    Other: {},
-  };
+// Main function to load and show stats
+function showStats() {
+  const statsContainer = document.getElementById("statsContainer");
 
-  // Initialize counts to zero for each weight category per main category
-  for (const cat of Object.keys(stats)) {
-    for (const wCat of weightCategories) {
-      stats[cat][wCat.label] = 0;
-    }
+  // Load participants from localStorage (assuming they are saved with key 'participants')
+  let participants = JSON.parse(localStorage.getItem("participants")) || [];
+
+  if (participants.length === 0) {
+    statsContainer.innerHTML = "<p>No participants data found.</p>";
+    return;
   }
 
-  for (const p of participants) {
-    const age = calculateAge(p.dob);
-    const cat = getCategory(age);
+  // Organize data: ageCategory -> weightCategory -> count
+  const statsData = {};
 
-    // Find weight category label
-    let wCatLabel = null;
-    for (const wCat of weightCategories) {
-      if (p.weight >= wCat.min && p.weight < wCat.max) {
-        wCatLabel = wCat.label;
-        break;
-      }
+  participants.forEach(p => {
+    const age = parseInt(p.age);
+    const weight = parseFloat(p.weight);
+
+    const ageCat = getAgeCategory(age);
+    const weightCat = getWeightCategory(weight);
+
+    if (!ageCat || !weightCat) return; // skip invalid data
+
+    if (!statsData[ageCat.label]) {
+      statsData[ageCat.label] = {};
     }
 
-    if (wCatLabel && stats[cat]) {
-      stats[cat][wCatLabel]++;
-    }
-  }
-
-  return stats;
-}
-
-function renderStats(stats) {
-  const container = document.getElementById("statsContainer");
-  container.innerHTML = "";
-
-  for (const [category, weights] of Object.entries(stats)) {
-    // Only show categories with participants
-    const totalInCategory = Object.values(weights).reduce((a, b) => a + b, 0);
-    if (totalInCategory === 0) continue;
-
-    const catSection = document.createElement("div");
-    catSection.classList.add("category-section");
-
-    const catHeading = document.createElement("h2");
-    catHeading.textContent = category + " Category";
-    catSection.appendChild(catHeading);
-
-    for (const [weightLabel, count] of Object.entries(weights)) {
-      if (count === 0) continue; // skip empty weight groups
-
-      const weightGroup = document.createElement("div");
-      weightGroup.classList.add("weight-group");
-      weightGroup.textContent = weightLabel;
-
-      const countSpan = document.createElement("span");
-      countSpan.classList.add("count");
-      countSpan.textContent = `(${count} participant${count > 1 ? "s" : ""})`;
-
-      weightGroup.appendChild(countSpan);
-      catSection.appendChild(weightGroup);
+    if (!statsData[ageCat.label][weightCat.label]) {
+      statsData[ageCat.label][weightCat.label] = 0;
     }
 
-    container.appendChild(catSection);
-  }
+    statsData[ageCat.label][weightCat.label]++;
+  });
 
-  // Show message if no data found
-  if (container.innerHTML.trim() === "") {
-    container.textContent = "No participant data available.";
+  // Now render the stats into HTML
+  statsContainer.innerHTML = ""; // Clear existing content
+
+  for (const [ageCat, weights] of Object.entries(statsData)) {
+    const catDiv = document.createElement("div");
+    catDiv.classList.add("category");
+
+    const catTitle = document.createElement("h2");
+    catTitle.textContent = ageCat;
+    catDiv.appendChild(catTitle);
+
+    for (const [weightCat, count] of Object.entries(weights)) {
+      const weightDiv = document.createElement("div");
+      weightDiv.classList.add("weight-category");
+      weightDiv.textContent = `${weightCat} — ${count} participant${count > 1 ? "s" : ""}`;
+      catDiv.appendChild(weightDiv);
+    }
+
+    statsContainer.appendChild(catDiv);
   }
 }
 
-window.onload = () => {
-  const participants = JSON.parse(localStorage.getItem("participants")) || [];
-  const stats = countParticipants(participants);
-  renderStats(stats);
-};
+// Run when page loads
+window.onload = showStats;
